@@ -1,8 +1,8 @@
 # DX12 AI Runtime
 
-> **Showroom-Repository.** Dies ist eine kuratierte Projektübersicht ohne Quellcode
-> (Shader, interne Datenformate und Verfahrensdetails sind bewusst nicht Teil dieser
-> Übersicht). Der vollständige Code liegt in einem privaten Repository.
+> Kuratierte Projektübersicht ohne Quellcode (Shader, interne Datenformate und
+> Verfahrensdetails sind bewusst nicht Teil dieser Übersicht). Der vollständige Code
+> liegt in einem privaten Repository.
 
 **KI-Inferenz, die in Ihrer Windows-Anwendung bleibt — ohne Python, ohne CUDA, ohne Cloud.**
 
