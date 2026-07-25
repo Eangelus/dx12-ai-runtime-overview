@@ -68,13 +68,9 @@ die aus Python heraus aufrufen möchten.
 - Höherer GPU-Durchsatz (Tiled GEMM, asynchrones Command-Submit)
 - Autoregressive Textgenerierung (erfordert KV-Cache, aktuell nicht enthalten)
 
-## Lizenzmodell
+## Lizenzierung
 
-| Tier | Umfang | Preis |
-|---|---|---|
-| **Community** | Source + Binaries unter MIT, nur NVIDIA, ohne Support | kostenlos |
-| **Professional** | Zusätzlich AMD-/Intel-Support, 1 Jahr Updates | ab € 2.490 / Jahr |
-| **Enterprise** | Source-Lizenz, Support-SLA, projektspezifische Anpassungen | auf Anfrage |
+Kommerzielles Lizenzmodell, Details auf Anfrage.
 
 ## Kontakt
 
