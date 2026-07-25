@@ -55,6 +55,11 @@ die aus Python heraus aufrufen möchten.
 | **MES/Fertigung** | Predictive Quality in air-gapped Werkshallen, ohne Internetanbindung |
 | **Windows-Kiosksysteme** | Kaltstart ohne Daemon — DLL laden und in Millisekunden inferieren |
 
+## Code-Beispiel
+
+→ [DEEP-DIVE.md](DEEP-DIVE.md) — ein konkreter Architektur-Ausschnitt (exception-sicherer
+Frame-Lifecycle per RAII) mit Code und Begründung, statt nur Fließtext.
+
 ## Ehrlicher Stand
 
 **Heute verifiziert:**
