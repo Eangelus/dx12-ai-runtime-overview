@@ -6,10 +6,14 @@
 
 **KI-Inferenz, die in Ihrer Windows-Anwendung bleibt — ohne Python, ohne CUDA, ohne Cloud.**
 
-DX12 AI Runtime führt den Forward-Pass eines Transformers vollständig als HLSL Compute
-Shader auf DirectX 12 aus — der GPU-Schnittstelle, die auf jedem Windows-PC bereits
-vorhanden ist. Aufrufbar aus jeder Win32-Anwendung über eine schlanke C-ABI-DLL: ein
-Funktionsaufruf, kein Prozess, kein Port, kein Daemon.
+DX12 AI Runtime führt die mathematischen Kernoperationen eines Transformer-Forward-Pass
+(MatMul, LayerNorm, Softmax, GELU, Multi-Head Attention) als HLSL Compute Shader auf
+DirectX 12 aus — der GPU-Schnittstelle, die auf jedem Windows-PC bereits vorhanden ist.
+„Vollständig" bezieht sich hier konkret auf diese Rechenoperationen selbst, nicht auf
+das gesamte NLP-Ökosystem: Tokenisierung/Embedding-Lookup vor dem Forward-Pass laufen
+außerhalb dieser Kernoperationen (siehe Einschränkungen unten). Aufrufbar aus jeder
+Win32-Anwendung über eine schlanke C-ABI-DLL: ein Funktionsaufruf, kein Prozess, kein
+Port, kein Daemon.
 
 ## Kennzahlen (verifiziert)
 
@@ -45,12 +49,27 @@ Prüfungen zusammen (strikt intern + toleranzbasiert extern) ergeben das Gesamtb
   MES-Produktivumgebungen häufig schlicht nicht erlaubt ist.
 - **Cloud-APIs** kosten Latenz, laufende Gebühren und werfen in regulierten Branchen
   Datenschutzfragen auf.
+- **DirectML** ist Teil von Windows und lässt sich technisch auch direkt aus C++
+  ansprechen — in der Praxis läuft der etablierte, gut dokumentierte Weg dorthin aber
+  fast immer über den ONNX-Runtime-Execution-Provider, nicht über die native API.
+  Wer ohnehin eigene, latenzoptimierte Kernel für ein sehr spezifisches Modell
+  schreibt (siehe Kennzahlen oben), gewinnt durch eine zusätzliche Abstraktionsschicht
+  über D3D12 hinaus keinen Vorteil, aber zusätzliche Komplexität.
 
 DX12 AI Runtime nutzt stattdessen die DirectX-12-Compute-Pipeline direkt — die
 DirectX-12-fähige GPU samt Standardtreiber wird weiterhin vorausgesetzt (wie bei
 jeder Windows-Anwendung mit Grafik-/Compute-Bezug), aber **zusätzlich** zu diesem
 ohnehin auf jedem Windows-PC vorhandenen Treiber ist kein separates SDK, kein
 CUDA-Toolkit und kein Python-Interpreter im Produktivbetrieb nötig.
+
+## Einschränkungen
+
+- Kein autoregressives Dekodieren (kein KV-Cache) — kein Ersatz für vollständige
+  Textgenerierung
+- Bisher nur auf NVIDIA verifiziert; AMD/Intel-Arc-Validierung ist als Nächstes geplant
+  (siehe unten)
+- Tokenisierung/Embedding-Lookup sind nicht Teil der oben genannten Kennzahlen und
+  liegen außerhalb der GPU-Kernoperationen dieses Projekts
 
 ## Signalweg
 
