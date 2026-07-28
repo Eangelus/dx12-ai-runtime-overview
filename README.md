@@ -15,14 +15,28 @@ Funktionsaufruf, kein Prozess, kein Port, kein Daemon.
 
 | Kennzahl | Wert | Kontext |
 |---|---|---|
-| p99-Latenz | **5.93 ms** | GPT-2-Klasse: 12 Layer, dModel=768, echtes Multi-Head Attention |
-| Numerische Abweichung | **0.000000** | MaxAbsError, bit-exakt vs. CPU-Referenzimplementierung |
-| Langzeit-Stabilität | **~318.000 Forward-Passes** | Gestaffelter Soak-Test, 0 Fehler, 0 VRAM-Leck |
-| Thermische Reserve | **62 °C max** | 28 °C Abstand zum Throttle-Punkt der Test-GPU |
+| p99-Latenz | **5.93 ms** | GPT-2-Klasse: 12 Layer, dModel=768, 12 Attention-Köpfe à 64 Dim, seqLen=16, Batch=1 |
+| Numerische Abweichung (intern) | **0.000000** | MaxAbsError ggü. eigener CPU-Referenzimplementierung¹ |
+| Numerische Abweichung (extern) | **100% innerhalb Toleranz** | ggü. ONNX Runtime CPU², atol=2.5e-3 + rtol=1e-2 |
+| Langzeit-Stabilität | **~318.000 Forward-Passes** | Gestaffelter Soak-Test (60s→900s), 0 Fehler, 0 VRAM-Leck |
+| Thermische Reserve | **62 °C max** | RTX 4070, 28 °C Abstand zum Throttle-Punkt (~90 °C) |
 | Laufzeit-Abhängigkeiten | **0** | Kein Python, kein CUDA, kein Cloud-Daemon für die Inferenz selbst |
 
-*Referenzmessungen: NVIDIA GeForce RTX 4070, Windows 11 Pro. Gilt für die getestete
-Hardware-/Treiber-/OS-Kombination.*
+*Referenzmessungen: NVIDIA GeForce RTX 4070 12 GB, Windows 11 Pro, FP32 durchgängig.
+Gilt für die getestete Hardware-/Treiber-/OS-Kombination — noch keine AMD/Intel-Messung
+(siehe „Als Nächstes" unten).*
+
+¹ *„Bit-exakt" bezieht sich konkret auf: identischer HLSL-Compute-Output vs. eine im
+selben Repo mitgeführte, unabhängig implementierte, naive CPU-Referenzberechnung
+derselben Operation (z. B. MatMul, Attention) — gleiche Eingabetensoren, gleiche
+FP32-Präzision, deterministisch (kein Sampling). Das ist ein interner
+Korrektheits-Check des GPU-Pfads gegen die eigene Spezifikation, kein Vergleich
+gegen ein externes Framework.*
+
+² *Der Vergleich gegen ONNX Runtime CPU (unabhängige, weit verbreitete Referenz-
+Implementierung) ist bewusst mit einer lockereren, für Float-Vergleiche über mehrere
+Layer üblichen Toleranz bewertet (kombiniert absolut+relativ), nicht bit-exakt — beide
+Prüfungen zusammen (strikt intern + toleranzbasiert extern) ergeben das Gesamtbild.*
 
 ## Warum GPU-Inferenz auf Windows heute unbequem ist
 
@@ -32,8 +46,11 @@ Hardware-/Treiber-/OS-Kombination.*
 - **Cloud-APIs** kosten Latenz, laufende Gebühren und werfen in regulierten Branchen
   Datenschutzfragen auf.
 
-DX12 AI Runtime nutzt stattdessen die DirectX-12-Compute-Pipeline direkt — kein
-Zusatztreiber, kein SDK-Download, kein Python-Interpreter im Produktivbetrieb.
+DX12 AI Runtime nutzt stattdessen die DirectX-12-Compute-Pipeline direkt — die
+DirectX-12-fähige GPU samt Standardtreiber wird weiterhin vorausgesetzt (wie bei
+jeder Windows-Anwendung mit Grafik-/Compute-Bezug), aber **zusätzlich** zu diesem
+ohnehin auf jedem Windows-PC vorhandenen Treiber ist kein separates SDK, kein
+CUDA-Toolkit und kein Python-Interpreter im Produktivbetrieb nötig.
 
 ## Signalweg
 
@@ -68,9 +85,11 @@ Kein Auszug aus dem produktiven Code.
 
 **Heute verifiziert:**
 - Stabile Win32-C-API (DLL-Export + Python-Wrapper, gegen echte DLL getestet)
-- Bit-exakte Korrektheit des kompletten Transformer-Blocks inkl. echtem Multi-Head Attention
+- Korrektheit des kompletten Transformer-Blocks inkl. echtem Multi-Head Attention:
+  bit-exakt gegen die eigene CPU-Referenz, innerhalb Toleranz gegen ONNX Runtime CPU
+  (Details siehe Kennzahlen-Fußnoten oben)
 - Dauerlast geprüft: kein VRAM-Leck, keine Fehler über ~318.000 Aufrufe
-- Durchgängig verifiziert auf Windows 11 + NVIDIA
+- Durchgängig verifiziert auf Windows 11 + NVIDIA — AMD/Intel noch offen
 
 **Als Nächstes:**
 - AMD- und Intel-Arc-Validierung (Hardware-Matrix wird bewusst erweitert)
