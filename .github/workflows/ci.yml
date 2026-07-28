@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "demo/**"
+      - ".github/workflows/ci.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "demo/**"
+      - ".github/workflows/ci.yml"
+
+jobs:
+  build-and-test:
+    name: Build + Test (demo/)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: demo
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Compile (warnings as errors)
+        run: g++ -std=c++17 -Wall -Wextra -Werror -Iinclude tests/test_scoped_guard.cpp -o test_scoped_guard
+
+      - name: Run tests
+        run: ./test_scoped_guard

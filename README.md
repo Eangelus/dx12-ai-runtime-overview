@@ -60,6 +60,10 @@ die aus Python heraus aufrufen möchten.
 → [DEEP-DIVE.md](DEEP-DIVE.md) — ein konkreter Architektur-Ausschnitt (exception-sicherer
 Frame-Lifecycle per RAII) mit Code und Begründung, statt nur Fließtext.
 
+→ [demo/](demo/) — eine eigenständige, kompilier- und testbare Mini-Demo desselben
+RAII-Musters (generalisiert, ohne GPU-Abhängigkeit), mit Tests und CI-Pipeline.
+Kein Auszug aus dem produktiven Code.
+
 ## Ehrlicher Stand
 
 **Heute verifiziert:**

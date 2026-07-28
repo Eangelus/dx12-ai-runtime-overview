@@ -1,0 +1,4 @@
+test_scoped_guard
+test_scoped_guard.exe
+*.o
+*.obj
